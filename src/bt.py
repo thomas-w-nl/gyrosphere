@@ -38,22 +38,27 @@ try:
         ctl = chr(data[0])
         print(ctl)
 
-        if ctl == "f" or ctl == "r":
+        if ctl == "1":
             spd = 100  # int(input("speed(0-100):"))
-            motor_l.drive(ctl, spd)
-            motor_r.drive(ctl, spd)
+            motor_l.drive("f", spd)
+            motor_r.drive("f", spd)
 
-        if ctl == "b":
+        if ctl == "2":
+            spd = 100  # int(input("speed(0-100):"))
+            motor_l.drive("r", spd)
+            motor_r.drive("r", spd)
+
+        if ctl == "10":
             spd = 100  # input("force(0-100):")
             motor_l.brake(spd)
             motor_r.brake(spd)
 
-        if ctl == "tl":
+        if ctl == "3":
             spd = 100  # int(input("speed(0-100):"))
             motor_l.drive("r", spd)
             motor_r.drive("f", spd)
 
-        if ctl == "tr":
+        if ctl == "4":
             spd = 100  # int(input("speed(0-100):"))
             motor_l.drive("f", spd)
             motor_r.drive("r", spd)

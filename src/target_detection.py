@@ -7,7 +7,7 @@ def get_target():
     Vind beweging in het zichtveld van de camera. 0 voor links en 1 voor rechts. -1 voor geen beweging.
     :return: De richting waar zich de beweging bevind,
     """
-
+    #camera.resolution = (320, 240)
     cap = cv2.VideoCapture(0)
     ret_cam, image = cap.read()
     resized = cv2.resize(image, (640, 480), interpolation=cv2.INTER_CUBIC)

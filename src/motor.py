@@ -1,19 +1,17 @@
 import RPi.GPIO as GPIO
 
-
+GPIO.setmode(GPIO.BCM)
 class Motor:
-    @staticmethod
-    def __enable(m1, m2, m_en):
-        GPIO.setup(m1, GPIO.OUT)
-        GPIO.setup(m2, GPIO.OUT)
-        GPIO.setup(m_en, GPIO.OUT)
 
     def __init__(self, pin1, pin2, pin_enable):
         GPIO.setmode(GPIO.BCM)
+
+        GPIO.setup(pin1, GPIO.OUT)
+        GPIO.setup(pin2, GPIO.OUT)
+        GPIO.setup(pin_enable, GPIO.OUT)
+
         self._pin1 = pin1
         self._pin2 = pin2
-
-        Motor.__enable(pin1, pin2, pin_enable)
         self._pin_enable_pwm = GPIO.PWM(pin_enable, 100)
         self._pin_enable_pwm.start(0)
 

@@ -1,3 +1,5 @@
+from time import sleep
+
 import cv2
 import numpy as np
 import operator
@@ -8,9 +10,19 @@ def get_target():
     :return: De richting waar zich de beweging bevind,
     """
     #camera.resolution = (320, 240)
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(-1)
+    cap.open()
+    sleep(.2)
+    if not cap.isOpened():
+        print("CAPTURE DEVICE NOT FOUND")
+
+        exit(2)
+
+
+
     ret_cam, image = cap.read()
     resized = cv2.resize(image, (640, 480), interpolation=cv2.INTER_CUBIC)
+
 
     resized_inv = cv2.bitwise_not(resized)  # red = cyan due to colorspace wraping
 
@@ -24,6 +36,9 @@ def get_target():
 
     # Bitwise-AND mask and original image
     res = cv2.bitwise_and(hsv, hsv, mask=mask)
+
+    cv2.imshow('frame', res)
+    cv2.waitKey(0)
 
     rows, cols, channels = hsv.shape
     sum_arr = []

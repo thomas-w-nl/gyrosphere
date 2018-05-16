@@ -1,8 +1,7 @@
-from src.battery import Battery
-from src.target_detection import get_target
-from src.motor import Motor
+from time import sleep
+from target_detection import get_target
+from motor import Motor
 
-battery = Battery()
 
 motor_r = Motor(6, 5, 13)
 motor_l = Motor(16, 18, 12)
@@ -34,6 +33,7 @@ while no_bt:
         motor_l.drive("f", spd)
         motor_r.drive("f", spd)
 
+    sleep(.5) # rustig aan doen
 
 
 

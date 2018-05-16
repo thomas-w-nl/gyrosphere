@@ -5,7 +5,7 @@
 # $Id: rfcomm-server.py 518 2007-08-10 07:20:07Z albert $
 
 from bluetooth import *
-#todo import stuff
+from motor import Motor
 
 motor_r = Motor(6, 5, 13)
 motor_l = Motor(16, 18, 12)
@@ -48,7 +48,7 @@ try:
             motor_l.drive("r", spd)
             motor_r.drive("r", spd)
 
-        if ctl == "10":
+        if ctl == "9":
             spd = 100  # input("force(0-100):")
             motor_l.brake(spd)
             motor_r.brake(spd)
@@ -70,9 +70,8 @@ try:
 except IOError:
     pass
 
-
-motor_l.brake(100)
-motor_r.brake(100)
+motor_l.drive("f", 0)
+motor_r.drive("f", 0)
 
 print("disconnected")
 

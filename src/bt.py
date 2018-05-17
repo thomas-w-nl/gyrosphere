@@ -7,78 +7,83 @@
 from bluetooth import *
 from motor import Motor
 
-motor_r = Motor(6, 5, 13)
-motor_l = Motor(16, 18, 12)
 
-server_sock = BluetoothSocket(RFCOMM)
-server_sock.bind(("", PORT_ANY))
-server_sock.listen(1)
+class GyroSphereBluetooth:
+    def __init__(self, event):
+        self.bt_event = event
 
-port = server_sock.getsockname()[1]
+        self.motor_r = Motor(6, 5, 13)
+        self.motor_l = Motor(16, 18, 12)
 
-uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
+        self.server_sock = BluetoothSocket(RFCOMM)
+        self.server_sock.bind(("", PORT_ANY))
+        self.server_sock.listen(1)
 
-advertise_service(server_sock, "SampleServer",
-                  service_id=uuid,
-                  service_classes=[uuid, SERIAL_PORT_CLASS],
-                  profiles=[SERIAL_PORT_PROFILE],
-                  #                   protocols = [ OBEX_UUID ]
-                  )
+        self.uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
 
-print("Waiting for connection on RFCOMM channel %d" % port)
+        advertise_service(self.server_sock, "Gyrosphere_control_server",
+                          service_id=self.uuid,
+                          service_classes=[self.uuid, SERIAL_PORT_CLASS],
+                          profiles=[SERIAL_PORT_PROFILE],
+                          #                   protocols = [ OBEX_UUID ]
+                          )
 
-client_sock, client_info = server_sock.accept()
-print("Accepted connection from ", client_info)
+    def handle_bluetooth_connection(self):
 
-try:
-    while True:
-        data = client_sock.recv(1024)
+        print("Waiting for bluetooth connection")
 
-        if len(data) == 0: break
-        #print("received [%s]" % data)
-        ctl = chr(data[0])
-        print(ctl)
+        client_sock, client_info = self.server_sock.accept()  # blocking
+        # block thread
+        self.bt_event.clear()
 
-        if ctl == "1":
-            spd = 100  # int(input("speed(0-100):"))
-            motor_l.drive("f", spd)
-            motor_r.drive("f", spd)
+        print("Accepted connection from ", client_info)
 
-        if ctl == "2":
-            spd = 100  # int(input("speed(0-100):"))
-            motor_l.drive("r", spd)
-            motor_r.drive("r", spd)
+        try:
+            while True:
+                data = client_sock.recv(1024)
 
-        if ctl == "9":
-            spd = 100  # input("force(0-100):")
-            motor_l.brake(spd)
-            motor_r.brake(spd)
+                if len(data) == 0: break
+                # print("received [%s]" % data)
+                ctl = chr(data[0])
+                print(ctl)
 
-        if ctl == "3":
-            spd = 100  # int(input("speed(0-100):"))
-            motor_l.drive("r", spd)
-            motor_r.drive("f", spd)
+                if ctl == "1":
+                    spd = 100  # int(input("speed(0-100):"))
+                    self.motor_l.drive("f", spd)
+                    self.motor_r.drive("f", spd)
 
-        if ctl == "4":
-            spd = 100  # int(input("speed(0-100):"))
-            motor_l.drive("f", spd)
-            motor_r.drive("r", spd)
+                if ctl == "2":
+                    spd = 100  # int(input("speed(0-100):"))
+                    self.motor_l.drive("r", spd)
+                    self.motor_r.drive("r", spd)
 
-        if ctl == "q":
-            break
+                if ctl == "9":
+                    spd = 100  # input("force(0-100):")
+                    self.motor_l.brake(spd)
+                    self.motor_r.brake(spd)
 
-        client_sock.send("Hello from pi")
+                if ctl == "3":
+                    spd = 100  # int(input("speed(0-100):"))
+                    self.motor_l.drive("r", spd)
+                    self.motor_r.drive("f", spd)
+
+                if ctl == "4":
+                    spd = 100  # int(input("speed(0-100):"))
+                    self.motor_l.drive("f", spd)
+                    self.motor_r.drive("r", spd)
+
+                if ctl == "q":
+                    break
+
+                client_sock.send("Hello from pi")
 
 
-except IOError:
-    pass
+        except IOError:
+            pass
+        print("disconnected")
 
-motor_l.drive("f", 0)
-motor_r.drive("f", 0)
+        client_sock.close()
+        # self.server_sock.close()
 
-print("disconnected")
-
-client_sock.close()
-server_sock.close()
-
-print("all done")
+        # unblock thread
+        self.bt_event.set()

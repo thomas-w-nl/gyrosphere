@@ -17,7 +17,7 @@ def get_target(cap):
     #cap.open()
 
     if not cap.isOpened():
-        # try sudo modprobe bcm2835-v4l2
+        #  sudo modprobe bcm2835-v4l2
 
         print("CAPTURE DEVICE NOT FOUND")
         exit(2)
@@ -32,23 +32,24 @@ def get_target(cap):
 
     resized_inv = cv2.bitwise_not(resized)  # red = cyan due to colorspace wraping
 
-    hsv = cv2.cvtColor(resized_inv, cv2.COLOR_BGR2HSV)
+    hsv_inv = cv2.cvtColor(resized_inv, cv2.COLOR_BGR2HSV)
 
     # define range of blue color in HSV
     lower_cyan = np.array([70, 50, 30])
     upper_cyan = np.array([90, 255, 255])
 
-    mask = cv2.inRange(hsv, lower_cyan, upper_cyan)
+    mask = cv2.inRange(hsv_inv, lower_cyan, upper_cyan)
 
     # Bitwise-AND mask and original image
-    res = cv2.bitwise_and(hsv, hsv, mask=mask)
+    res = cv2.bitwise_and(hsv_inv, hsv_inv, mask=mask)
 
 
     #cv2.imshow('mask', res)
+    #cv2.waitKey(0)
 
 
     print("calculating target...")
-    rows, cols, channels = hsv.shape
+    rows, cols, channels = hsv_inv.shape
     sum_arr = []
 
     for i in range(cols):
@@ -71,45 +72,49 @@ def get_target(cap):
     return direction
 
 
-# if __name__ == "__main__":
-#
-#
-#     image = cv2.imread('/home/thomas/PycharmProjects/gyrosphere/data/vga.jpg')
-#     resized = cv2.resize(image, (640, 480), interpolation=cv2.INTER_CUBIC)
-#
-#     resized_inv = cv2.bitwise_not(resized) # red = cyan due to colorspace wraping
-#
-#     hsv = cv2.cvtColor(resized_inv, cv2.COLOR_BGR2HSV)
-#
-#     # define range of blue color in HSV
-#     lower_cyan = np.array([70,50,30])
-#     upper_cyan = np.array([90,255,255])
-#
-#     mask = cv2.inRange(hsv, lower_cyan, upper_cyan)
-#
-#     # Bitwise-AND mask and original image
-#     res = cv2.bitwise_and(hsv, hsv, mask=mask)
-#
-#     rows, cols, channels = hsv.shape
-#     sum_arr = []
-#
-#
-#     for i in range(cols):
-#         col_sum = 0
-#         for j in range(rows):
-#             for x in range(channels):
-#                 col_sum += res[j, i, x]
-#
-#         sum_arr.append(col_sum)
-#
-#
-#
-#     index, value = max(enumerate(sum_arr), key=operator.itemgetter(1))
-#
-#     print(index)
-#
-#     cv2.imshow('frame', res)
-#     #cv2.imshow('mask', mask)
-#     #cv2.imshow('res', res)
-#     cv2.waitKey(0)
-#
+if __name__ == "__main__":
+
+
+    image = cv2.imread('/home/thomas/PycharmProjects/gyrosphere/data/cola.jpg')
+    resized = cv2.resize(image, (640, 480), interpolation=cv2.INTER_CUBIC)
+
+    resized_inv = cv2.bitwise_not(resized) # red = cyan due to colorspace wraping
+
+    hsv_inv = cv2.cvtColor(resized_inv, cv2.COLOR_BGR2HSV)
+
+    # define range of blue color in HSV
+    lower_cyan = np.array([70,50,30])
+    upper_cyan = np.array([90,255,255])
+
+    mask = cv2.inRange(hsv_inv, lower_cyan, upper_cyan)
+
+    # Bitwise-AND mask and original image
+    res = cv2.bitwise_and(hsv_inv, hsv_inv, mask=mask)
+
+    # again but with de-inverted colors for human viewing
+    res_normal = cv2.bitwise_and(resized, resized, mask=mask)
+
+    rows, cols, channels = hsv_inv.shape
+    sum_arr = []
+
+
+    for i in range(cols):
+        col_sum = 0
+        for j in range(rows):
+            for x in range(channels):
+                col_sum += res[j, i, x]
+
+        sum_arr.append(col_sum)
+
+
+
+    index, value = max(enumerate(sum_arr), key=operator.itemgetter(1))
+
+    print(index)
+
+
+    cv2.imshow('frame', res_normal)
+    #cv2.imshow('mask', mask)
+    #cv2.imshow('res', res)
+    cv2.waitKey(0)
+

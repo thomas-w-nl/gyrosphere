@@ -33,6 +33,7 @@ print("Accepted connection from ", client_info)
 try:
     while True:
         data = client_sock.recv(1024)
+
         if len(data) == 0: break
         #print("received [%s]" % data)
         ctl = chr(data[0])
@@ -65,6 +66,8 @@ try:
 
         if ctl == "q":
             break
+
+        client_sock.send("Hello from pi")
 
 
 except IOError:

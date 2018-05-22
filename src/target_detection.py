@@ -136,7 +136,7 @@ if __name__ == "__main__":
         w, h, c = resized.shape
         # Filter by Area.
         params.filterByArea = True
-        params.minArea = int(((w + h) / 4) + 1)
+        params.minArea = int(((w + h) / 10) + 1)
 
         # Filter by Circularity
         params.filterByCircularity = False
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 if keypoint.size > max:
                     max = keypoint.size
                     max_pos = pos
-                    print(max_pos, len(keypoints))
+
 
                 pos += 1
 

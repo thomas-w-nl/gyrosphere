@@ -80,7 +80,6 @@ def get_target(cap):
             if keypoint.size > max:
                 max = keypoint.size
                 max_pos = pos
-                print(max_pos, len(keypoints))
 
             pos += 1
 

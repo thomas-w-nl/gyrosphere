@@ -3,10 +3,17 @@ import cv2
 from target_detection import get_target
 from motor import Motor
 
+from led_light import Led_light
+
 
 class GyrosphereAutopilot:
     def __init__(self, event):
         self.bt_event = event
+
+        self.led_light = Led_light(0,0,0)
+        self.led_light.setName("Led Light")
+
+
 
         self.cap = cv2.VideoCapture(-1)
         sleep(.2)
@@ -28,23 +35,27 @@ class GyrosphereAutopilot:
                 # turn left
                 self.motor_l.drive("r", spd)
                 self.motor_r.drive("f", spd)
-                self.led_light.light_on(255, 0, 0)
+                self.led_light.set_color(1, 0, 0)
+                self.led_light.run()
 
             elif target_direction >= 0.8:
                 # turn right
                 self.motor_l.drive("f", spd)
                 self.motor_r.drive("r", spd)
-                self.led_light.light_on(0, 255, 0)
+
+                self.led_light.set_color(0, 1, 0)
+                self.led_light.run()
 
             elif target_direction == -1:
-                # turn to find something
-                self.motor_l.drive("r", spd)
-                self.motor_r.drive("f", spd)
+                # turn to find something at a slower pace
+                self.motor_l.drive("r", spd/2)
+                self.motor_r.drive("f", spd/2)
 
             elif 0.6 > target_direction > 0.4:
                 self.motor_l.drive("f", spd)
                 self.motor_r.drive("f", spd)
-                self.led_light.light_on(0, 0, 255)
+                self.led_light.set_color(0, 0, 1)
+                self.led_light.run()
 
             elif 0.8 > target_direction >= 0.6:
                 spd = 50

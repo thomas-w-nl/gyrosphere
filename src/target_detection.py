@@ -3,8 +3,11 @@ import time
 
 import cv2
 import numpy as np
-import operator
 
+
+# define range of red color in ycc
+lower_red = np.array([60, 140, 121])
+upper_red = np.array([115, 180, 134])
 
 def get_target(cap):
     """
@@ -20,48 +23,79 @@ def get_target(cap):
         print("CAPTURE DEVICE NOT FOUND")
         exit(2)
 
-    ret_cam, image = cap.read()
-    resized = image  # cv2.resize(image, (100, 100), interpolation=cv2.INTER_CUBIC)
+    ret_cam, resized = cap.read()
 
-    resized_inv = cv2.bitwise_not(resized)  # red = cyan due to colorspace wraping
-    resized_inv = cv2.blur(resized_inv, (10, 10))
 
-    hsv_inv = cv2.cvtColor(resized_inv, cv2.COLOR_BGR2HSV)
 
-    # define range of blue color in HSV
-    lower_cyan = np.array([80, 60, 80])
-    upper_cyan = np.array([90, 255, 255])
+    resized = cv2.blur(resized, (10, 10))
 
-    mask = cv2.inRange(hsv_inv, lower_cyan, upper_cyan)
+
+
+    ycc = cv2.cvtColor(resized, cv2.COLOR_BGR2YCrCb)
+    mask = cv2.inRange(ycc, lower_red, upper_red)
 
     # Bitwise-AND mask and original image
-    res = cv2.bitwise_and(hsv_inv, hsv_inv, mask=mask)
-
-    # cv2.imshow('mask', res)
-    # cv2.waitKey(0)
+    masked_resized = cv2.bitwise_and(resized, resized, mask=mask)
 
 
-    print("calculating target...")
-    rows, cols, channels = hsv_inv.shape
-    sum_arr = []
+    params = cv2.SimpleBlobDetector_Params()
 
-    for i in range(cols):
-        col_sum = 0
-        for j in range(rows):
-            for x in range(channels):
-                col_sum += res[j, i, x]
+    # Change thresholds
+    params.minThreshold = 10
+    params.maxThreshold = 200
+    params.blobColor = 255
 
-        sum_arr.append(col_sum)
+    w, h, c = resized.shape
+    # Filter by Area.
+    params.filterByArea = True
+    params.minArea = int(((w + h) / 4) + 1)
 
-    index, value = max(enumerate(sum_arr), key=operator.itemgetter(1))
-    print("done")
+    # Filter by Circularity
+    params.filterByCircularity = False
+    params.minCircularity = 0.1
 
-    if value == 0:
-        return -1
+    # Filter by Convexity
+    params.filterByConvexity = False
+    params.minConvexity = 0.01
 
-    direction = index / len(sum_arr)
+    # Filter by Inertia
+    params.filterByInertia = False
+    params.minInertiaRatio = 0.1
 
-    return direction
+    # Create a detector with the parameters
+    detector = cv2.SimpleBlobDetector_create(params)
+
+    # Detect blobs.
+    keypoints = detector.detect(mask)
+
+
+    # get biggest blob
+    if len(keypoints) > 0:
+        max = 0
+        pos = 0
+        max_pos = 0
+
+        for keypoint in keypoints:
+
+            if keypoint.size > max:
+                max = keypoint.size
+                max_pos = pos
+                print(max_pos, len(keypoints))
+
+            pos += 1
+
+        biggest_target = keypoints[max_pos]
+
+        target_position = biggest_target.pt[0] / resized.shape[1]
+
+
+
+    else:
+        target_position = -1
+
+    # print(target_position)
+
+    return target_position
 
 
 if __name__ == "__main__":
@@ -80,46 +114,17 @@ if __name__ == "__main__":
         start = time.clock()
         ret_cam, resized = cap.read()
 
+        ret_cam, resized = cap.read()
 
-        ########################################################### MASKING
-
-        # image = cv2.imread('/home/pi/gyrosphere/src/cola.jpg')
-        # resized = cv2.resize(image, (640, 480), interpolation=cv2.INTER_CUBIC)
-
-        resized_inv = cv2.bitwise_not(resized)  # red = cyan due to colorspace wraping
+        resized = cv2.blur(resized, (10, 10))
 
 
-        #########  BLUR
-        #resized_inv = cv2.GaussianBlur(resized_inv, (15, 15), 0)
 
-        resized_inv = cv2.blur(resized_inv, (10, 10))
-
-        ######### end BLUR
-        # define range of blue color in HSV
-        lower_cyan = np.array([80, 15, 40])
-        upper_cyan = np.array([90, 255, 255])
-
-        hsv_inv = cv2.cvtColor(resized_inv, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv_inv, lower_cyan, upper_cyan)
+        ycc = cv2.cvtColor(resized, cv2.COLOR_BGR2YCrCb)
+        mask = cv2.inRange(ycc, lower_red, upper_red)
 
         # Bitwise-AND mask and original image
-        masked_resized_inv = cv2.bitwise_and(resized_inv, resized_inv, mask=mask)
-
-        # again but with de-inverted colors for human viewing
-        res_normal = cv2.bitwise_and(resized, resized, mask=mask)
-
-        ############################################################## END MASKING
-
-
-
-        # mask = cv2.GaussianBlur(mask, (15, 15), 0)
-        # _, mask = cv2.threshold(mask, 124, 255, cv2.THRESH_BINARY)
-        # # Show mask
-
-
-        #
-
-
+        masked_resized = cv2.bitwise_and(resized, resized, mask=mask)
 
         params = cv2.SimpleBlobDetector_Params()
 
@@ -131,7 +136,7 @@ if __name__ == "__main__":
         w, h, c = resized.shape
         # Filter by Area.
         params.filterByArea = True
-        params.minArea = int(((w + h) / 40) + 1)
+        params.minArea = int(((w + h) / 4) + 1)
 
         # Filter by Circularity
         params.filterByCircularity = False
@@ -156,18 +161,44 @@ if __name__ == "__main__":
         # the size of the circle corresponds to the size of blob
 
         im_with_keypoints = cv2.drawKeypoints(mask, keypoints, np.array([]), (0, 0, 255),
-                                             cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+                                              cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         end = time.clock()
 
-        #todo
-        keypoints[0].pt # position
-        keypoints[0].size # size
+        # todo
+        # keypoints[0].pt # position
+        # keypoints[0].size # size
+
+        if len(keypoints) > 0:
+            max = 0
+            pos = 0
+            max_pos = 0
+
+            for keypoint in keypoints:
+
+                if keypoint.size > max:
+                    max = keypoint.size
+                    max_pos = pos
+                    print(max_pos, len(keypoints))
+
+                pos += 1
+
+            biggest_target = keypoints[max_pos]
+
+            target_position = biggest_target.pt[0] / resized.shape[1]
+
+
+
+        else:
+            target_position = -1
+
 
 
 
         # Show blobs
         #cv2.imshow('result', mask)
+
+
         cv2.imshow('result', im_with_keypoints)
         k = cv2.waitKey(5) & 0xFF
         if k == 27:

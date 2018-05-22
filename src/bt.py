@@ -43,8 +43,14 @@ class GyroSphereBluetooth:
                 data = client_sock.recv(1024)
 
                 if len(data) == 0: break
+                if len(data) > 1000: break
                 # print("received [%s]" % data)
-                ctl = chr(data[0])
+
+                ctl = ""
+
+                for i in data:
+                    ctl += chr(i)
+
                 print(ctl)
 
                 if ctl == "1":
@@ -71,6 +77,10 @@ class GyroSphereBluetooth:
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("f", spd)
                     self.motor_r.drive("r", spd)
+
+                if ctl == "b":
+                    pass
+                    # switch naar detectie blauw.
 
                 if ctl == "q":
                     break

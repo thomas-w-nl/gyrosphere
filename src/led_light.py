@@ -11,16 +11,22 @@ class Led_light(Thread):
         self.r = r
         self.b = b
         self.g = g
+        GPIO.setup(26, GPIO.OUT)
+        GPIO.setup(20, GPIO.OUT)
+        GPIO.setup(21, GPIO.OUT)
 
     def run(self):
-
-        GPIO.setup(4, GPIO.OUT)
-        # Zet de LED aan.
-        GPIO.output(4, 1)
-        sleep(.5)
-        # Zet de LED uit.
-        GPIO.output(4, 0)
-        sleep(0.5)
+        for i in range(0,3):
+            # Zet de LED aan.
+            GPIO.output(26, self.r)
+            GPIO.output(20, self.g)
+            GPIO.output(21, self.b)
+            sleep(.4)
+            # Zet de LED uit.
+            GPIO.output(26, 0)
+            GPIO.output(20, 0)
+            GPIO.output(21, 0)
+            sleep(0.4)
 
     def set_color(self, r, g, b):
         self.r = r

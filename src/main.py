@@ -1,3 +1,4 @@
+from queue import Queue
 from time import sleep
 
 import threading
@@ -8,11 +9,13 @@ from bt import GyroSphereBluetooth
 
 
 class BluetoothThread(Thread):
+
     def __init__(self, event):
         Thread.__init__(self)
         self.bt_event = event
 
     def run(self):
+
         gbt = GyroSphereBluetooth(bt_event)
         # bt loop
         while True:
@@ -25,6 +28,8 @@ class BluetoothThread(Thread):
 if __name__ == "__main__":
 
     print("Starting")
+
+
 
 
     bt_event = threading.Event()

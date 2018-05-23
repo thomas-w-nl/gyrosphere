@@ -10,6 +10,7 @@ from motor import Motor
 
 class GyroSphereBluetooth:
     def __init__(self, event):
+
         self.bt_event = event
 
         self.motor_r = Motor(6, 5, 13)
@@ -29,6 +30,8 @@ class GyroSphereBluetooth:
                           )
 
     def handle_bluetooth_connection(self):
+
+
 
         print("Waiting for bluetooth connection")
 

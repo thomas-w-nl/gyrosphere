@@ -20,7 +20,7 @@ upper_blue = np.array([105, 111, 179])
 
 
 
-def get_target(cap, color):
+def get_target(cap):
     """
     Vind beweging in het zichtveld van de camera. 0 voor links en 1 voor rechts. -1 voor geen beweging.
     :return: De richting waar zich de beweging bevind,
@@ -44,12 +44,14 @@ def get_target(cap, color):
 
     ycc = cv2.cvtColor(resized, cv2.COLOR_BGR2YCrCb)
 
-    if color == "red":
-        mask = cv2.inRange(ycc, lower_red, upper_red)
-    if color == "blue":
-        mask = cv2.inRange(ycc, lower_blue, upper_blue)
-    if color == "yellow":
-        mask = cv2.inRange(ycc, lower_yellow, upper_yellow)
+
+
+    mask = cv2.inRange(ycc, lower_red, upper_red)
+
+    # if color == "blue":
+    #     mask = cv2.inRange(ycc, lower_blue, upper_blue)
+    # if color == "yellow":
+    #     mask = cv2.inRange(ycc, lower_yellow, upper_yellow)
 
     # Bitwise-AND mask and original image
     masked_resized = cv2.bitwise_and(resized, resized, mask=mask)

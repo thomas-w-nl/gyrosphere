@@ -6,7 +6,7 @@
 
 from bluetooth import *
 from motor import Motor
-
+from led_light import Led_light
 
 class GyroSphereBluetooth:
     def __init__(self, event):
@@ -41,6 +41,13 @@ class GyroSphereBluetooth:
 
         print("Accepted connection from ", client_info)
 
+        led_light = Led_light(0, 0, 1)
+
+        led_light.setName("Led Light")
+
+        led_light.run()
+
+
         try:
             while True:
                 data = client_sock.recv(1024)
@@ -60,11 +67,15 @@ class GyroSphereBluetooth:
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("f", spd)
                     self.motor_r.drive("f", spd)
+                    led_light = Led_light(0, 0, 1)
+                    led_light.run()
 
                 if ctl == "2":
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("r", spd)
                     self.motor_r.drive("r", spd)
+                    led_light = Led_light(1, 0, 0)
+                    led_light.run()
 
                 if ctl == "9":
                     spd = 100  # input("force(0-100):")

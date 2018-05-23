@@ -19,8 +19,8 @@ class Led_light(Thread):
         for i in range(0,3):
             # Zet de LED aan.
             GPIO.output(26, self.r)
-            GPIO.output(20, self.g)
-            GPIO.output(21, self.b)
+            GPIO.output(20, self.b)
+            GPIO.output(21, self.g)
             sleep(.4)
             # Zet de LED uit.
             GPIO.output(26, 0)
@@ -33,3 +33,7 @@ class Led_light(Thread):
         self.b = b
         self.g = g
 
+if __name__ == "__main__":
+    led_light = Led_light(1, 0, 0)
+    led_light.setName("Led Light")
+    led_light.run()

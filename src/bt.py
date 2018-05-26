@@ -57,44 +57,52 @@ class GyroSphereBluetooth:
                 # print("received [%s]" % data)
 
                 ctl = ""
+                ctl1 = chr(data[0])
 
                 for i in data:
                     ctl += chr(i)
 
                 print(ctl)
 
-                if ctl == "1":
+                if ctl1 == "1":
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("f", spd)
                     self.motor_r.drive("f", spd)
                     led_light = Led_light(0, 0, 1)
                     led_light.run()
 
-                if ctl == "2":
+                if ctl1 == "2":
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("r", spd)
                     self.motor_r.drive("r", spd)
-                    led_light = Led_light(1, 0, 0)
-                    led_light.run()
 
-                if ctl == "9":
+
+                if ctl1 == "9":
                     spd = 100  # input("force(0-100):")
                     self.motor_l.brake(spd)
                     self.motor_r.brake(spd)
 
-                if ctl == "3":
+                if ctl1 == "3":
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("r", spd)
                     self.motor_r.drive("f", spd)
 
-                if ctl == "4":
+                if ctl1 == "4":
                     spd = 100  # int(input("speed(0-100):"))
                     self.motor_l.drive("f", spd)
                     self.motor_r.drive("r", spd)
 
-                if ctl == "b":
-                    pass
-                    # switch naar detectie blauw.
+                if ctl == "red":
+                    led_light = Led_light(1, 0, 0)
+                    led_light.run()
+
+                if ctl == "yellow":
+                    led_light = Led_light(0, 1, 1)
+                    led_light.run()
+
+                if ctl == "green":
+                    led_light = Led_light(0, 1, 0)
+                    led_light.run()
 
                 if ctl == "q":
                     break

@@ -6,8 +6,8 @@ import numpy as np
 
 
 # define range of red color in ycc
-lower_red = np.array([60, 140, 121])
-upper_red = np.array([115, 180, 134])
+lower_red = np.array([61, 162, 23])
+upper_red = np.array([191, 251, 237])
 
 # define range of yellow color in ycc
 lower_yellow = np.array([143, 128, 59])

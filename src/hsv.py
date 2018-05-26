@@ -28,8 +28,8 @@ if __name__ == "__main__":
 
     #
     cap = cv2.VideoCapture(-1)
-    cap.set(3, 320)
-    cap.set(4, 240)
+    cap.set(3, 200)
+    cap.set(4, 200)
 
     # Creating track bar
     # cv2.createTrackbar('h_min', 'result', 0, 179, nothing)
@@ -49,9 +49,14 @@ if __name__ == "__main__":
     cv2.createTrackbar('Cb_min', 'result', 0, 255, nothing)
     cv2.createTrackbar('Cb_max', 'result', 0, 255, nothing)
 
-    cv2.setTrackbarPos('Cr_max', 'result', 255)
-    cv2.setTrackbarPos('Cb_max', 'result', 255)
-    cv2.setTrackbarPos('y_max', 'result', 255)
+    cv2.setTrackbarPos('Cr_min', 'result', 167)
+    cv2.setTrackbarPos('Cr_max', 'result', 238)
+
+    cv2.setTrackbarPos('Cb_min', 'result', 167)
+    cv2.setTrackbarPos('Cb_max', 'result', 238)
+
+    cv2.setTrackbarPos('y_max', 'result', 216)
+    cv2.setTrackbarPos('y_min', 'result', 56)
 
     while (1):
         ret_cam, frame = cap.read()
@@ -103,9 +108,10 @@ if __name__ == "__main__":
         result = cv2.bitwise_and(frame, frame, mask=mask)
 
         cv2.imshow('result', result)
+        cv2.waitKey()
 
-        k = cv2.waitKey(5) & 0xFF
-        if k == 27:
-            break
+        # k = cv2.waitKey(5) & 0xFF
+        # if k == 27:
+        #     break
 
     cv2.destroyAllWindows()

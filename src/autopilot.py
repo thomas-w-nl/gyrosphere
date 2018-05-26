@@ -31,17 +31,18 @@ class GyrosphereAutopilot:
             target_direction = get_target(self.cap)
             print("target direction:", target_direction)
 
-            if target_direction <= 0.2:
-                # turn left
-                self.motor_l.drive("r", spd)
-                self.motor_r.drive("f", spd)
+            if 0 < target_direction <= 0.25:
+                # turn right
+                self.motor_l.drive("f", spd)
+                self.motor_r.drive("r", 0)
+
                 self.led_light.set_color(1, 0, 0)
                 self.led_light.run()
 
-            elif target_direction >= 0.8:
-                # turn right
-                self.motor_l.drive("f", spd)
-                self.motor_r.drive("r", spd)
+            elif target_direction >= 0.75:
+                # turn left
+                self.motor_l.drive("r", 0)
+                self.motor_r.drive("f", spd)
 
                 self.led_light.set_color(0, 1, 0)
                 self.led_light.run()
@@ -51,21 +52,13 @@ class GyrosphereAutopilot:
                 self.motor_l.drive("r", spd/2)
                 self.motor_r.drive("f", spd/2)
 
-            elif 0.6 > target_direction > 0.4:
+            elif 0.75 > target_direction > 0.25:
                 self.motor_l.drive("f", spd)
                 self.motor_r.drive("f", spd)
+
                 self.led_light.set_color(0, 0, 1)
                 self.led_light.run()
 
-            elif 0.8 > target_direction >= 0.6:
-                spd = 50
-                self.motor_l.drive("f", spd)
-                self.motor_r.drive("r", spd)
-
-            elif 0.4 >= target_direction > 0.2:
-                spd = 50
-                self.motor_l.drive("r", spd)
-                self.motor_r.drive("f", spd)
 
 
 

@@ -1,46 +1,69 @@
-from src.battery import Battery
-from src.motion_detection import get_target
-from src.motor import Motor
+from time import sleep
+import cv2
+from target_detection import get_target
+from motor import Motor
 
-battery = Battery()
-
-motor_r = Motor(6, 5, 13)
-motor_l = Motor(16, 18, 12)
-
-target_direction = get_target()
+from led_light import Led_light
 
 
-def rotate():
-    spd = 100
+class GyrosphereAutopilot:
+    def __init__(self, event):
+        self.bt_event = event
 
-    if target_direction == 0:
-        motor_l.drive("r", spd)
-        motor_r.drive("f", spd)
-
-    elif target_direction == 1:
-        motor_l.drive("f", spd)
-        motor_r.drive("r", spd)
-
-    elif target_direction == 0.5:
-        motor_l.drive("f", spd)
-        motor_r.drive("f", spd)
-
-    elif target_direction == -1:
-        motor_l.drive("f", spd)
-        motor_r.drive("r", spd)
+        self.led_light = Led_light(0,0,0)
+        self.led_light.setName("Led Light")
 
 
-def shut_down():
-    spd = 0
 
-    if battery.get_spanning() == 3.70:
-        motor_l.brake(spd)
-        motor_r.brake(spd)
+        self.cap = cv2.VideoCapture(-1)
+        sleep(.2)
 
-# go to target
+        self.motor_r = Motor(6, 5, 13)
+        self.motor_l = Motor(16, 18, 12)
 
-# if no target is found go look for one
+    def pilot(self):
 
-# if battery is empty shutdown
+        while True:
+            # the event is set if there is no bt connection
+            self.bt_event.wait()
 
-# 3.6-4.2 voor battery
+            spd = 100
+            target_direction = get_target(self.cap)
+            print("target direction:", target_direction)
+
+            if 0 < target_direction <= 0.25:
+                # turn right
+                self.motor_l.drive("f", spd)
+                self.motor_r.drive("r", 0)
+
+                self.led_light.set_color(1, 0, 0)
+                self.led_light.run()
+
+            elif target_direction >= 0.75:
+                # turn left
+                self.motor_l.drive("r", 0)
+                self.motor_r.drive("f", spd)
+
+                self.led_light.set_color(0, 1, 0)
+                self.led_light.run()
+
+            elif target_direction == -1:
+                # turn to find something at a slower pace
+                self.motor_l.drive("r", spd/2)
+                self.motor_r.drive("f", spd/2)
+
+            elif 0.75 > target_direction > 0.25:
+                self.motor_l.drive("f", spd)
+                self.motor_r.drive("f", spd)
+
+                self.led_light.set_color(0, 0, 1)
+                self.led_light.run()
+
+
+
+
+        # go to target
+
+        # if no target is found go look for one
+
+        # if battery is empty shutdown

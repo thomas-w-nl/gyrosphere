@@ -4,7 +4,6 @@ import time
 import cv2
 import numpy as np
 
-
 # define range of red color in ycc
 lower_red = np.array([61, 162, 23])
 upper_red = np.array([191, 251, 237])
@@ -18,16 +17,14 @@ lower_blue = np.array([23, 87, 145])
 upper_blue = np.array([105, 111, 179])
 
 
-
-
 def get_target(cap):
     """
-    Vind beweging in het zichtveld van de camera. 0 voor links en 1 voor rechts. -1 voor geen beweging.
-    :return: De richting waar zich de beweging bevind,
+    Vind een kleur in het zichtveld van de camera. 0 voor links en 1 voor rechts. -1 voor geen beweging.
+    :param cap: De opencv camera
+    :return: De richting waarin zich het doel bevind
     """
     cap.set(3, 320)
     cap.set(4, 240)
-
 
     if not cap.isOpened():
         #  sudo modprobe bcm2835-v4l2
@@ -36,26 +33,11 @@ def get_target(cap):
 
     ret_cam, resized = cap.read()
 
-
-
     resized = cv2.blur(resized, (10, 10))
-
-
 
     ycc = cv2.cvtColor(resized, cv2.COLOR_BGR2YCrCb)
 
-
-
     mask = cv2.inRange(ycc, lower_red, upper_red)
-
-    # if color == "blue":
-    #     mask = cv2.inRange(ycc, lower_blue, upper_blue)
-    # if color == "yellow":
-    #     mask = cv2.inRange(ycc, lower_yellow, upper_yellow)
-
-    # Bitwise-AND mask and original image
-    masked_resized = cv2.bitwise_and(resized, resized, mask=mask)
-
 
     params = cv2.SimpleBlobDetector_Params()
 
@@ -87,7 +69,6 @@ def get_target(cap):
     # Detect blobs.
     keypoints = detector.detect(mask)
 
-
     # get biggest blob
     if len(keypoints) > 0:
         max = 0
@@ -107,11 +88,10 @@ def get_target(cap):
         target_position = biggest_target.pt[0] / resized.shape[1]
 
 
-
+    # if no blobs are found
     else:
         target_position = -1
 
-    # print(target_position)
 
     return target_position
 
@@ -135,8 +115,6 @@ if __name__ == "__main__":
         ret_cam, resized = cap.read()
 
         resized = cv2.blur(resized, (10, 10))
-
-
 
         ycc = cv2.cvtColor(resized, cv2.COLOR_BGR2YCrCb)
         mask = cv2.inRange(ycc, lower_red, upper_red)
@@ -198,7 +176,6 @@ if __name__ == "__main__":
                     max = keypoint.size
                     max_pos = pos
 
-
                 pos += 1
 
             biggest_target = keypoints[max_pos]
@@ -210,11 +187,8 @@ if __name__ == "__main__":
         else:
             target_position = -1
 
-
-
-
         # Show blobs
-        #cv2.imshow('result', mask)
+        # cv2.imshow('result', mask)
 
 
         cv2.imshow('result', im_with_keypoints)

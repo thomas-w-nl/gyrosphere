@@ -30,11 +30,11 @@ while ctl != "q":
         motor_r.drive("r", spd)
 
     if ctl == "q":
+        motor_l.brake(100)
+        motor_r.brake(100)
         break
 
 
 
-motor_l.brake(100)
-motor_r.brake(100)
 
 

@@ -11,17 +11,22 @@ from led_light import Led_light
 class GyroSphereBluetooth:
     def __init__(self, event):
 
+        #shared event die de main thread blockt
         self.bt_event = event
 
+# instellen van de motoren op de fysieke pins
         self.motor_r = Motor(6, 5, 13)
         self.motor_l = Motor(16, 18, 12)
 
+        # Standaard bluetooth settings
         self.server_sock = BluetoothSocket(RFCOMM)
         self.server_sock.bind(("", PORT_ANY))
         self.server_sock.listen(1)
 
+        # port die het zelfde is op de app
         self.uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
 
+# aanbieden van de socket
         advertise_service(self.server_sock, "Gyrosphere_control_server",
                           service_id=self.uuid,
                           service_classes=[self.uuid, SERIAL_PORT_CLASS],
@@ -35,15 +40,16 @@ class GyroSphereBluetooth:
 
         print("Waiting for bluetooth connection")
 
+
         client_sock, client_info = self.server_sock.accept()  # blocking
-        # block thread
+
+        # block main autopilot thread
         self.bt_event.clear()
 
         print("Accepted connection from ", client_info)
 
+        # blink blue light
         led_light = Led_light(0, 0, 1)
-
-        led_light.setName("Led Light")
 
         led_light.run()
 
@@ -56,39 +62,45 @@ class GyroSphereBluetooth:
                 if len(data) > 1000: break
                 # print("received [%s]" % data)
 
-                ctl = ""
+
                 ctl1 = chr(data[0])
 
+
+                ctl = ""
                 for i in data:
                     ctl += chr(i)
 
+
+
                 print(ctl)
 
+                spd = 100
+
                 if ctl1 == "1":
-                    spd = 100  # int(input("speed(0-100):"))
+
                     self.motor_l.drive("f", spd)
                     self.motor_r.drive("f", spd)
                     led_light = Led_light(0, 0, 1)
                     led_light.run()
 
                 if ctl1 == "2":
-                    spd = 100  # int(input("speed(0-100):"))
+
                     self.motor_l.drive("r", spd)
                     self.motor_r.drive("r", spd)
 
 
                 if ctl1 == "9":
-                    spd = 100  # input("force(0-100):")
+
                     self.motor_l.brake(spd)
                     self.motor_r.brake(spd)
 
                 if ctl1 == "3":
-                    spd = 100  # int(input("speed(0-100):"))
+
                     self.motor_l.drive("r", spd)
                     self.motor_r.drive("f", spd)
 
                 if ctl1 == "4":
-                    spd = 100  # int(input("speed(0-100):"))
+
                     self.motor_l.drive("f", spd)
                     self.motor_r.drive("r", spd)
 
@@ -107,7 +119,6 @@ class GyroSphereBluetooth:
                 if ctl == "q":
                     break
 
-                client_sock.send("Hello from pi")
 
 
         except IOError:

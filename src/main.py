@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     bt_event = threading.Event()
 
-    #set it so autopilot can start
+    #set it so autopilot can startz
     bt_event.set()
 
     tr = BluetoothThread(bt_event)

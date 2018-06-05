@@ -5,7 +5,7 @@ import threading
 from threading import Thread
 
 from autopilot import GyrosphereAutopilot
-from bt import BluetoothThread
+from bluetooth import BluetoothThread
 
 
 if __name__ == "__main__":

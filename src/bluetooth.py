@@ -5,7 +5,9 @@ from threading import Thread
 
 
 class BluetoothThread(Thread):
+
     def __init__(self, event):
+
         Thread.__init__(self)
         self.bt_event = event
         # instellen van de motoren op de fysieke pins

@@ -22,12 +22,6 @@ if __name__ == "__main__":
     bt_thread = BluetoothThread(bt_event)
     bt_thread.start()
 
-    # start the autopilot
+    # start the autopilot forever
     gap = GyrosphereAutopilot(bt_event)
     gap.pilot()
-
-    # wait for the autopilot thread to get stopped
-    gap.join()
-
-
-
